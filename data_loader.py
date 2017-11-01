@@ -9,7 +9,7 @@ trainingSetPath = 'Data/trainingSet/'
 sentenceTypes = []
 sentenceTypes.append("Multiply {number1} by {number2}")
 sentenceTypes.append("Square {number1}")
-numExamples = 10;
+numExamples = 100000;
 
 
 
@@ -56,7 +56,7 @@ def main():
             
             imagePath = trainingSetPath
             if len(answer) == 1:
-                numImages = len(filenames[number1])
+                numImages = len(filenames[int(answer)])
                 numImages = random.randint(1,numImages-1)
                 imagePath = imagePath+answer+"/"+filenames[int(answer)][numImages]
                 inputImage =  cv2.imread(imagePath.encode(),0)
