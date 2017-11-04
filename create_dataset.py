@@ -1,101 +1,144 @@
 import os
 import random
 import cv2
-import os
 import numpy as np
-import matplotlib.pyplot as plt
+
+
+sentenceFile = open("sentences.txt", 'r')
 
 trainingSetPath = 'Data/trainingSet/'
-sentenceTypes = []
-sentenceTypes.append("Multiply {number1} by {number2}")
-sentenceTypes.append("Square {number1}")
-numExamples = 100000;
+inputPath = r'./dataset/input/'
+sentenceTypes = {}
+numExamples = 100;
 
 
+def fetchSentenceTemplates():
+    line = sentenceFile.readline()
+    action = ""
+    while line != "":
+        splits = line.split(' ')
+        if splits[0] == '****':
+            action = splits[1]
+            sentenceTypes[action] = []
+        else :
+            sentencelist = sentenceTypes.get(action)
+            sentencelist.append(line)
+        line = sentenceFile.readline()
+            
+    return
 
-def getSolution(sentence, number1, number2):
-    words  = sentence.split(" ")
-    if words[0] == 'Multiply':
-        answer = number1*number2
+
+def getSolution(actions, number, number1):
+    if actions.strip() == 'Multiply':
+        answer = number*number1
         return str(answer)
-    elif words[0] == 'Square':
-        answer = number1*number1
+    elif actions.strip() == 'Square':
+        answer = number*number
         return str(answer)
     
 
-
-def main():
-    labelDirs = next(os.walk(trainingSetPath))[1]
-    #print(labelDirs)
+def getFilenames():
+    labelDirs = next(os.walk(trainingSetPath))[1]    
     filenames = []
     for dir in labelDirs:
         path = trainingSetPath+str(dir)
         filenames.append(os.listdir(path))
-    
+    return filenames
+
+
+def getrandomSentence(sentenceType,number1):
+    sentences = sentenceTypes.get(sentenceType)
+    randomNumber = random.randint(0,len(sentences)-1)
+    sentence = sentences[randomNumber]
+    sentence = sentence.replace('{number1}',str(number1))
+    return sentence
+
+def getRandomImage(number, filenames):
+    randomNumber = random.randint(0,len(filenames[number])-1)
+    print(number,randomNumber)
+    print(len(filenames),len(filenames[number]))
+    imagePath = trainingSetPath+str(number)+'/'+filenames[number][randomNumber]
+    return cv2.imread(imagePath.encode(),0)
+
+def create_GAN_dataset():
+    print('Creating GAN Dataset...')
+    filenames = getFilenames()
+    fetchSentenceTemplates()
     index = 0;
     input_sentences = []
-    for sentence in sentenceTypes:
+    for sentenceType in sentenceTypes:
+        print (sentenceType)
         for i in range(numExamples):
+            #print(i)
+            number = random.randint(0,9)
             number1 = random.randint(0,9)
-            number2 = random.randint(0,9)
-            inputSentence = sentence.replace("{number1}",str(number1))
-            inputSentence = inputSentence.replace("{number2}",str(number2))
+            
+            inputSentence = getrandomSentence(sentenceType, number1)
+            answer = getSolution(sentenceType, number,number1)
+            #print(inputSentence)
+            inputSentence = inputSentence.strip() +" "+str(answer)
             input_sentences.append(inputSentence)
-
-            numImages = len(filenames[number1])
-            numImages = random.randint(1,numImages-1)
-            imagePath = trainingSetPath+str(number1)+'/'+filenames[number1][numImages]
-            inputImage =  cv2.imread(imagePath.encode(),0)
-
-            #cv2.imshow('image',inputImage)
+            inputImage =  getRandomImage(number, filenames)
             pic_name = r'./dataset/input/img_'+str(index)+'.jpg'
-            print(cv2.imwrite(pic_name, inputImage ))
+            cv2.imwrite(pic_name, inputImage )
             
-            answer = getSolution(inputSentence, number1,number2)
-            print(answer)
-            
-            imagePath = trainingSetPath
             if len(answer) == 1:
-                numImages = len(filenames[int(answer)])
-                numImages = random.randint(1,numImages-1)
-                imagePath = imagePath+answer+"/"+filenames[int(answer)][numImages]
-                inputImage =  cv2.imread(imagePath.encode(),0)
-                
                 pic_name = r'./dataset/output/img_'+str(index)+'.jpg'
-                print(cv2.imwrite(pic_name, inputImage ))
+                ensure_dir(pic_name)
+                cv2.imwrite(pic_name, getRandomImage(int(answer),filenames))
             else:
                 number1 = int(answer[0])
                 number2 = int(answer[1])
                 
-                numImages = len(filenames[number1])
-                numImages = random.randint(1,numImages-1)
-                image1Path = imagePath+str(number1)+"/"+filenames[number1][numImages]
-                input1 =  cv2.imread(image1Path.encode(),0)
-
-                
-                numImages = len(filenames[number2])
-                numImages = random.randint(1,numImages-1)
-                image2Path = imagePath+str(number2)+"/"+filenames[number2][numImages]
-                input2 =  cv2.imread(image2Path.encode(),0)
+                input1 = getRandomImage(number1, filenames)
+                input2 = getRandomImage(number2, filenames)
                 
                 output_image = concatenateAndResize(input1, input2)
                 pic_name = r'./dataset/output/img_'+str(index)+'.jpg'
-                print(cv2.imwrite(pic_name, output_image ))
+                ensure_dir(pic_name)
+                cv2.imwrite(pic_name, output_image )
                 
             
             index += 1
             
-    
+            
+    ensure_dir("dataset/input/sentences.txt")
     sentence_file = open("dataset/input/sentences.txt",'w+')
     
     for sentence in input_sentences:
         sentence_file.write(sentence+'\n')
     sentence_file.close()
-            
-
-    combined_image = concatenateAndResize(cv2.imread("Data/trainingSample/img_8.jpg",0),cv2.imread("Data/trainingSample/img_3.jpg",0))
     
     return
+
+def createMNIST100():
+    size = 60
+    filenames = getFilenames()
+    for i in range(100):
+        for j in range(size):
+            num = str(i)
+            image_name = r'dataset/mnist/'+num+'/img_'+str(j)+'.jpg'
+            ensure_dir(image_name)
+            
+            if i > 9:
+                number1 = int(num[0])
+                number2 = int(num[1])
+            
+                input1 = getRandomImage(number1, filenames)
+                input2 = getRandomImage(number2, filenames)
+                
+                output_image = concatenateAndResize(input1, input2)
+                cv2.imwrite(image_name, output_image )
+            else :
+                output_image = getRandomImage(i, filenames)
+                cv2.imwrite(image_name, output_image )
+                
+    return
+
+def ensure_dir(file_path):
+    directory = os.path.dirname(file_path)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
 
 
 def concatenateAndResize(img1, img2):
@@ -119,4 +162,9 @@ def concatenateAndResize(img1, img2):
 
 
 if __name__ == "__main__":
-    main()
+    createGANDataset = False
+    
+    if createGANDataset :
+        create_GAN_dataset()
+    else : 
+        createMNIST100()
