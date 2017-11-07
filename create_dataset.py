@@ -55,8 +55,6 @@ def getrandomSentence(sentenceType,number1):
 
 def getRandomImage(number, filenames):
     randomNumber = random.randint(0,len(filenames[number])-1)
-    #print(number,randomNumber)
-    #print(len(filenames),len(filenames[number]))
     imagePath = trainingSetPath+str(number)+'/'+filenames[number][randomNumber]
     return cv2.imread(imagePath.encode(),0)
 
@@ -67,15 +65,12 @@ def create_GAN_dataset():
     index = 0;
     input_sentences = []
     for sentenceType in sentenceTypes:
-        #print (sentenceType)
         for i in range(numExamples):
-            #print(i)
             number = random.randint(0,9)
             number1 = random.randint(0,9)
             
             inputSentence = getrandomSentence(sentenceType, number1)
             answer = getSolution(sentenceType, number,number1)
-            #print(inputSentence)
             inputSentence = inputSentence.strip() +" "+str(answer)
             input_sentences.append(inputSentence)
             inputImage =  getRandomImage(number, filenames)
@@ -112,10 +107,12 @@ def create_GAN_dataset():
     return
 
 def createMNIST100():
+
+    print('Creating MNIST100 Dataset...')
     size = 600
     filenames = getFilenames()
     for i in range(100):
-	print ("Generating "+str(i))
+        print ("Generating "+str(i))
         for j in range(size):
             num = str(i)
             image_name = r'dataset/mnist/'+num+'/img_'+str(j)+'.jpg'
@@ -154,10 +151,6 @@ def concatenateAndResize(img1, img2):
     vis[:h2, w1:w1+w2] = img2
     
     resized_image = cv2.resize(vis, (28, 28)) 
-    
-    #plt.imshow(resized_image, cmap = 'gray', interpolation = 'bicubic')
-    #plt.xticks([]), plt.yticks([])  # to hide tick values on X and Y axis
-    #plt.show()
     
     return resized_image
 
