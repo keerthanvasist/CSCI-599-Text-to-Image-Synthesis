@@ -9,7 +9,7 @@ sentenceFile = open("sentences.txt", 'r')
 trainingSetPath = 'Data/trainingSet/'
 inputPath = r'./dataset/input/'
 sentenceTypes = {}
-numExamples = 100;
+numExamples = 600;
 
 
 def fetchSentenceTemplates():
@@ -107,11 +107,12 @@ def create_GAN_dataset():
     return
 
 def createMNIST100():
+
     print('Creating MNIST100 Dataset...')
-    size = 6000
+    size = 600
     filenames = getFilenames()
     for i in range(100):
-        print(i)
+        print ("Generating "+str(i))
         for j in range(size):
             num = str(i)
             image_name = r'dataset/mnist/'+num+'/img_'+str(j)+'.jpg'
