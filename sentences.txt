@@ -1,0 +1,7 @@
+**** Multiply
+Multiply number by {number1}
+Number multiplied by {number1}
+{number1} multiplied by the number
+**** Square
+Square the number
+Number squared
