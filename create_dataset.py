@@ -9,7 +9,7 @@ sentenceFile = open("sentences.txt", 'r')
 trainingSetPath = 'Data/trainingSet/'
 inputPath = r'./dataset/input/'
 sentenceTypes = {}
-numExamples = 100;
+numExamples = 600;
 
 
 def fetchSentenceTemplates():
@@ -55,8 +55,8 @@ def getrandomSentence(sentenceType,number1):
 
 def getRandomImage(number, filenames):
     randomNumber = random.randint(0,len(filenames[number])-1)
-    print(number,randomNumber)
-    print(len(filenames),len(filenames[number]))
+    #print(number,randomNumber)
+    #print(len(filenames),len(filenames[number]))
     imagePath = trainingSetPath+str(number)+'/'+filenames[number][randomNumber]
     return cv2.imread(imagePath.encode(),0)
 
@@ -67,7 +67,7 @@ def create_GAN_dataset():
     index = 0;
     input_sentences = []
     for sentenceType in sentenceTypes:
-        print (sentenceType)
+        #print (sentenceType)
         for i in range(numExamples):
             #print(i)
             number = random.randint(0,9)
@@ -112,9 +112,10 @@ def create_GAN_dataset():
     return
 
 def createMNIST100():
-    size = 60
+    size = 600
     filenames = getFilenames()
     for i in range(100):
+	print ("Generating "+str(i))
         for j in range(size):
             num = str(i)
             image_name = r'dataset/mnist/'+num+'/img_'+str(j)+'.jpg'
