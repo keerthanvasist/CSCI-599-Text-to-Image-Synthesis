@@ -11,36 +11,51 @@ import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 import math
-
-def unpickle(file):
-    import sys
-    if sys.version_info.major == 2:
-        import cPickle
-        with open(file, 'rb') as fo:
-            dict = cPickle.load(fo)
-        return dict['data'], dict['labels']
-    else:
-        import pickle
-        with open(file, 'rb') as fo:
-            dict = pickle.load(fo, encoding='bytes')
-        return dict[b'data'], dict[b'labels']
-
-def load_train_data():
-    X = []
-    for i in range(5):
-        X_, _ = unpickle('data/cifar-10-batches-py/data_batch_%d' % (i + 1))
-        X.append(X_)
-    X = np.concatenate(X)
-    X = X.reshape((X.shape[0], 3, 32, 32)).transpose(0, 2, 3, 1)
-    return X
-
-def load_test_data():
-    X_, _ = unpickle('data/cifar-10-batches-py/test_batch')
-    X = X_.reshape((X_.shape[0], 3, 32, 32)).transpose(0, 2, 3, 1)
-    return X
+import os
 
 # Load cifar-10 data
-#train_samples = load_train_data() / 255.0
+
+
+def load_input_images():
+    working_dir = "/dataset/input/"
+    file_list = []
+    for root, dirs, files in os.walk(working_dir):
+        
+        for filename in files:
+            if filename.endswith('.jpg'):
+                file_list.append(root + "/" + filename) 
+    X_data=[]
+    print(file_list)
+    X_data_train=[]
+    X_data_eval=[]
+    X_data_test=[]
+    for myfile in file_list:
+        image=imread(myfile)
+        X_data.append(image)
+    X_data=np.asarray(X_data)
+    """label_list=get_label_list()
+    X_data_shuffle, label_list_shuffle=X_data.reshape(60000,1,28,28), label_list
+    X_train, X_test, labels_train, labels_test=train_test_split(X_data_shuffle, label_list_shuffle,test_size=0.2, random_state=42)
+    X_train, X_val, labels_train, labels_val=train_test_split(X_train, labels_train,test_size=0.2, random_state=42)
+    
+    X_data_train=X_train.reshape(X_train.shape[0], 1, 28, 28).transpose(
+        0, 2, 3, 1).astype("uint8")
+    X_data_eval=X_val.reshape(X_val.shape[0], 1, 28, 28).transpose(
+        0, 2, 3, 1).astype("uint8")
+    X_data_test=X_test.reshape(X_test.shape[0], 1, 28, 28).transpose(
+        0, 2, 3, 1).astype("uint8")
+       
+    print('X_data_train shape:', np.array(X_data_train).shape)
+    print('X_data_eval shape:', np.array(X_data_eval).shape)
+    print('X_data_test shape:', np.array(X_data_test).shape)
+    print labels_train.shape
+    print labels_val.shape
+    print labels_test.shape"""
+    #return X_data_train, labels_train, X_data_eval, labels_val, X_data_test, labels_test
+
+
+load_input_images()
+#train_samples = load_input_images() / 255.0
 #test_samples = load_test_data() / 255.0
 
 def viz_grid(Xs, padding):
