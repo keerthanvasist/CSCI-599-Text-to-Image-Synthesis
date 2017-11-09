@@ -9,7 +9,7 @@ sentenceFile = open("sentences.txt", 'r')
 trainingSetPath = 'Data/trainingSet/'
 inputPath = r'./dataset/input/'
 sentenceTypes = {}
-numExamples = 600;
+numExamples = 30000;
 
 
 def fetchSentenceTemplates():
@@ -75,7 +75,7 @@ def create_GAN_dataset():
             input_sentences.append(inputSentence)
             inputImage =  getRandomImage(number, filenames)
             pic_name = r'./dataset/input/img_'+str(index)+'.jpg'
-            cv2.imwrite(pic_name, inputImage )
+            print(cv2.imwrite(pic_name, inputImage ))
             
             if len(answer) == 1:
                 pic_name = r'./dataset/output/img_'+str(index)+'.jpg'
@@ -156,7 +156,7 @@ def concatenateAndResize(img1, img2):
 
 
 if __name__ == "__main__":
-    createGANDataset = False
+    createGANDataset = True
     
     if createGANDataset :
         create_GAN_dataset()
