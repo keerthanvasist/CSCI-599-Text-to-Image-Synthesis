@@ -12,6 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 import os
+import random
 import sklearn
 from scipy.ndimage import imread
 # Load cifar-10 data
@@ -55,8 +56,12 @@ def load_input_sentences():
 
 
 
-input_images = load_input_images()
+input_images = load_input_images('./dataset/input')
 input_sentences, labels = load_input_sentences()
+
+inputs = list(zip(input_images, input_sentences, labels))
+random.shuffle(inputs)
+input_images, input_sentences, labels = zip(*inputs)
 #train_samples = load_input_images() / 255.0
 #test_samples = load_test_data() / 255.0
 
