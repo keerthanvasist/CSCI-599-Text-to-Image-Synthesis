@@ -192,10 +192,13 @@ class DCGAN(object):
             dis_fc4 = fc(dis_reshape3, 1, 'fc4')
             return dis_fc4
 
-    def _generator(self, input):
+    def _generator(self, noise,text_embedding, image_input):
         with tf.variable_scope('gen', reuse = self._gen_called):
             self._gen_called = True
-            gen_fc1 = fc(input, 4 * 4 * 128, 'fc1')
+            gen_fc1 = fc(text_embedding, 256, 'fc1')
+            gen_relu1 = leaky_relu(gen_fc1)
+            z_text = tf.concat(1,[noise, gen_relu1])
+            
             gen_reshape1 = tf.reshape(gen_fc1, [-1, 4, 4, 128])
             gen_batchnorm1 = batch_norm(gen_reshape1, self.is_train)
             gen_lrelu1 = leaky_relu(gen_batchnorm1)
@@ -207,7 +210,7 @@ class DCGAN(object):
             gen_lrelu3 = leaky_relu(gen_batchnorm3)
             gen_conv4 = conv2d_transpose(gen_lrelu3, 4, 2, 3, 'conv4')
             gen_sigmoid4 = tf.sigmoid(gen_conv4)
-            return gen_sigmoid4
+            return gen_sigmoid4:
 
     def _loss(self, labels, logits):
         loss = tf.nn.sigmoid_cross_entropy_with_logits(labels = labels, logits = logits)
