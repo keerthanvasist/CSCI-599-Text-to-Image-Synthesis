@@ -10,6 +10,7 @@ import random
 import sklearn
 from scipy.ndimage import imread
 import skipthoughts
+import nltk
 
 
 # Load cifar-10 data
@@ -36,6 +37,7 @@ def load_input_images(path):
     return images / 255.0
     
 def load_input_sentences():
+    nltk.download('popular')
     sentence_file = open('./dataset/input/sentences.txt','r')
     sentence = sentence_file.readline()
     
