@@ -15,6 +15,9 @@ import os
 import random
 import sklearn
 from scipy.ndimage import imread
+import skipthoughts
+
+
 # Load cifar-10 data
 
 
@@ -36,7 +39,7 @@ def load_input_images(path):
     images=images.reshape(images.shape[0], 1, 28, 28).transpose(
         0, 2, 3, 1).astype("uint8")
        
-    return images
+    return images / 255.0
     
 def load_input_sentences():
     sentence_file = open('./dataset/input/sentences.txt','r')
@@ -62,7 +65,28 @@ input_sentences, labels = load_input_sentences()
 inputs = list(zip(input_images, input_sentences, labels))
 random.shuffle(inputs)
 input_images, input_sentences, labels = zip(*inputs)
-#train_samples = load_input_images() / 255.0
+
+model = skipthoughts.load_model()
+encoder = skipthoughts.Encoder(model)
+input_sentences = encoder.encode(input_sentences)
+
+def load_input(path):
+    input_images = load_input_images(path)
+    input_sentences, labels = load_input_sentences()
+    
+    inputs = list(zip(input_images, input_sentences, labels))
+    random.shuffle(inputs)
+    input_images, input_sentences, labels = zip(*inputs)
+    
+    model = skipthoughts.load_model()
+    encoder = skipthoughts.Encoder(model)
+    input_sentences = encoder.encode(input_sentences)
+    
+    return input_images, input_sentences, labels
+
+
+train_path = './dataset/input/'
+train_images, train_sentences, train_labels = load_input(train_path) / 255.0
 #test_samples = load_test_data() / 255.0
 
 def viz_grid(Xs, padding):
